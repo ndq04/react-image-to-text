@@ -1,13 +1,12 @@
-function Result({image, text, setText}) {
+function Result({text, setText}) {
   return (
-    <div>
-      {image && (
-        <img src={image && URL.createObjectURL(image)} alt='' className='' />
-      )}
+    <div className='w-[95%] h-[95%] m-auto'>
       <textarea
         rows='15'
         value={text}
         onChange={(e) => setText(e.target.value)}
+        className='w-full h-full p-5 rounded-xl shadow-2xl 
+        shadow-[#f3d9d9] resize-none border-none outline-none'
       ></textarea>
     </div>
   )

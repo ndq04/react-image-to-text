@@ -1,9 +1,8 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useDispatch} from 'react-redux'
 import Tesseract from 'tesseract.js'
 import Alert from './components/Alert'
 import Home from './components/Home'
-import Loading from './components/Loading'
 import Result from './components/Result'
 import {ACTION_TYPES} from './redux/actions/actionTypes'
 import checkimage from './utils/checkImage'
@@ -121,14 +120,16 @@ function App() {
   const handleChangeLanguage = (e) => setLanguage(e.target.value)
 
   const dispatch = useDispatch()
+  useEffect(() => {
+    setText('')
+  }, [image])
 
   const handleConvert = () => {
     if (image) {
       setIsLoading(true)
-
       Tesseract.recognize(image, language, {
         logger: (m) => {
-          console.log(m)
+          // console.log(m)
           if (m.status === 'recognizing text') {
             setProgress(parseInt(m.progress * 100))
           }
@@ -136,6 +137,7 @@ function App() {
       }).then(({data: {text}}) => {
         setText(text)
         setIsLoading(false)
+        setProgress(0)
       })
     } else {
       return dispatch({
@@ -160,22 +162,28 @@ function App() {
   }
 
   return (
-    <div className='bg-[#f0f2f5] min-h-screen'>
+    <div className='app min-h-screen grid grid-cols-2'>
       <Alert />
-      {isLoading && <Loading progress={progress} />}
-      {!isLoading && !text && (
-        <Home
-          image={image}
-          uploadImage={uploadImage}
-          handleConvert={handleConvert}
-          languages={languages}
-          language={language}
-          handleChangeLanguage={handleChangeLanguage}
-        />
+      <Home
+        image={image}
+        uploadImage={uploadImage}
+        handleConvert={handleConvert}
+        languages={languages}
+        language={language}
+        handleChangeLanguage={handleChangeLanguage}
+        progress={progress}
+        isLoading={isLoading}
+      />
+      {!text && (
+        <div className='flex'>
+          <div className='text-[#fff] font-bold text-9xl m-auto'>
+            <p>Covert</p>
+            <p>Image</p>
+            <p>To Text</p>
+          </div>
+        </div>
       )}
-      {!isLoading && text && (
-        <Result image={image} text={text} setText={setText} />
-      )}
+      {!isLoading && text && <Result text={text} setText={setText} />}
     </div>
   )
 }
